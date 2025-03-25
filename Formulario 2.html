@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Pacientes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: url('Logo Psico.png') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #e8c5c5;
+            border-bottom: none;
+        }
+
+        .tab.active {
+            background-color: #e8c5c5;
+        }
+
+        .content {
+            display: none;
+            background: rgb(247, 237, 237);
+            padding: 20px;
+            opacity: 0.9;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        h2,
+        h3 {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            border: none;
+            width: 50%;
+            font-weight: normal;
+        }
+
+        textarea {
+            height: 50px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            cursor: pointer;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tabs">
+        <div class="tab active" onclick="mostrarAba('cadastro')">Cadastro de Pacientes</div>
+        <div class="tab" onclick="mostrarAba('relatorios')">Relatórios</div>
+        <div class="tab" onclick="mostrarAba('laudo')">Laudo</div>
+        <div class="tab" onclick="mostrarAba('prontuario')">Prontuário</div>
+    </div>
+
+    <div id="cadastro" class="content active">
+        <form id="cadastroForm">
+            <h3>Dados Pessoais</h3>
+            <label>Nome Completo:</label>
+            <input type="text" id="nome" required>
+            <label>E-mail:</label>
+            <input type="email" id="email">
+            <label>Data de Nascimento:</label>
+            <input type="date" id="dataNascimento">
+            <label>Sexo Biológico:</label>
+            <input type="text" id="sexoBiologico">
+            <label>Gênero:</label>
+            <input type="text" id="genero">
+            <label>Celular:</label>
+            <input type="text" id="celular">
+            <button type="button" onclick="salvarPDF('cadastro', 'Cadastro de Pacientes')">Salvar como PDF</button>
+        </form>
+    </div>
+
+    <div id="relatorios" class="content">
+        <form id="relatoriosForm">
+            <label>Nome do Paciente:</label>
+            <input type="text">
+            <label>Nome do Responsável:</label>
+            <input type="text">
+            <label>Idade:</label>
+            <input type="text">
+            <label>Escolaridade:</label>
+            <input type="text">
+            <label>Queixa Principal:</label>
+            <textarea></textarea>
+            <button type="button" onclick="salvarPDF('relatorios', 'Relatório')">Salvar como PDF</button>
+        </form>
+    </div>
+
+    <div id="laudo" class="content">
+        <form id="laudoForm">
+            <h3>1. Identificação</h3>
+            <label>Autor:</label>
+            <input type="text">
+            <label>CRP:</label>
+            <input type="text">
+            <button type="button" onclick="salvarPDF('laudo', 'Laudo')">Salvar como PDF</button>
+        </form>
+    </div>
+
+    <div id="prontuario" class="content">
+        <form id="prontuarioForm">
+            <label>Data de Atendimento:</label>
+            <input type="date" id="dataAtendimento">
+            <label>Horário da Sessão:</label>
+            <input type="text">
+            <button type="button" onclick="salvarPDF('prontuario', 'Prontuário')">Salvar como PDF</button>
+        </form>
+    </div>
+
+    <script>
+        function mostrarAba(aba) {
+            document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(aba).classList.add('active');
+            document.querySelector(`.tab[onclick="mostrarAba('${aba}')"]`).classList.add('active');
+        }
+
+        function salvarPDF(aba, titulo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let form = document.getElementById(aba).querySelector('form');
+            let campos = form.querySelectorAll('label, input, textarea');
+            let y = 10;
+
+            doc.setFontSize(14);
+            doc.text(titulo, 10, y);
+            y += 10;
+
+            doc.setFontSize(11);
+            campos.forEach(el => {
+                if (el.tagName === 'LABEL') {
+                    doc.setFont(undefined, 'bold');
+                    doc.text(el.innerText, 10, y);
+                    y += 6;
+                } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    doc.setFont(undefined, 'normal');
+                    doc.text(el.value, 10, y);
+                    y += 10;
+                }
+            });
+
+            doc.save(`${titulo}.pdf`);
+        }
+    </script>
+</body>
+
+</html>
